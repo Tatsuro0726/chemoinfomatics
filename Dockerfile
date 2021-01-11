@@ -22,15 +22,18 @@ RUN wget https://repo.anaconda.com/archive/Anaconda3-2020.07-Linux-x86_64.sh && 
     rm -f Anaconda3-2020.07-Linux-x86_64.sh
 ENV PATH /opt/anaconda3/bin:$PATH
 
+# 仮想環境作成
+RUN conda create -c rdkit -n rdkit-env rdkit
+
 # bashに変更
 SHELL ["/bin/bash", "-c"]
 
-# 仮想環境作成
-RUN conda create -n rdkit-env python=3.6.0
-
 # RDKit install
-RUN	source activate rdkit-env && \
+RUN source activate rdkit-env && \
     conda update -n base -c defaults conda && \
-    conda install -c rdkit rdkit=2018.09.1 && \
-    conda install -y scikit-learn ipykernel && \
-    python -m ipykernel install --user --name rdkit-env --display-name rdkit-env
+    conda install -y scikit-learn ipykernel matplotlib && \
+    
+# Register kernel 
+python -m ipykernel install --user --name rdkit-env --display-name rdkit-env
+
+CMD ["jupyter-lab", "--no-browser", "--ip=0.0.0.0", "--allow-root", "--NotebookApp.token=''"]
